@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>법정 영웅 — 판례 01</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Do+Hyeon&family=Hi+Melody&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --pink: #ff5a8c;
+    --pink-light: #ffd6e2;
+    --yellow: #ffd93d;
+    --yellow-light: #fff3a3;
+    --cyan: #4ecdc4;
+    --cyan-light: #c8eeea;
+    --purple: #8b5cf6;
+    --purple-light: #d4c2f7;
+    --green: #06d6a0;
+    --green-light: #c4f0dc;
+    --orange: #ff9a3c;
+    --bg-1: #fff8ec;
+    --bg-2: #ffe7f0;
+    --bg-3: #e7f4ff;
+    --ink: #2a2640;
+    --ink-soft: #6a6280;
+  }
+  body {
+    margin: 0;
+    font-family: 'Jua', sans-serif;
+    background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+    font-weight: 400;
+    letter-spacing: -0.2px;
+  }
+
+  /* 헤딩 폰트는 부드러운 Do Hyeon으로 (이전 Black Han Sans는 너무 굵음) */
+  h1, h2, h3, .title-font {
+    font-family: 'Do Hyeon', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  /* 본문은 부드러운 Jua */
+  p, div, span, button {
+    font-family: 'Jua', sans-serif;
+  }
+
+  #game {
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 14px;
+    padding-bottom: 100px;
+  }
+
+  /* ═══════ 상단 HUD ═══════ */
+  .hud {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 0 var(--ink), 0 6px 16px rgba(0,0,0,0.1);
+    margin-bottom: 18px;
+  }
+  .hud-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .hud-label {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-family: 'Do Hyeon', sans-serif;
+    letter-spacing: 0.5px;
+  }
+  .hud-value {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 24px;
+    color: var(--pink);
+  }
+  .level-badge {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 15px;
+    color: #fff;
+    box-shadow: 0 3px 0 var(--ink);
+    border: 2.5px solid var(--ink);
+  }
+
+  /* ═══════ 화면 ═══════ */
+  .screen { display: none; animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .screen.active { display: block; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ═══════ 타이틀 ═══════ */
+  h1.game-title {
+    font-size: 56px;
+    text-align: center;
+    margin: 40px 0 10px;
+    color: var(--pink);
+    line-height: 1;
+    text-shadow:
+      3px 3px 0 var(--yellow),
+      6px 6px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  .subtitle {
+    text-align: center;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 20px;
+    color: var(--purple);
+    margin: 0 0 30px;
+    letter-spacing: 2px;
+  }
+
+  /* ═══════ 카드 ═══════ */
+  .card {
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    padding: 22px;
+    margin: 14px 0;
+    box-shadow: 0 5px 0 var(--ink), 0 6px 14px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .card.pop-pink { border-top: 12px solid var(--pink); }
+  .card.pop-yellow { border-top: 12px solid var(--yellow); }
+  .card.pop-cyan { border-top: 12px solid var(--cyan); }
+  .card.pop-purple { border-top: 12px solid var(--purple); }
+  .card.pop-green { border-top: 12px solid var(--green); }
+
+  .card h2 {
+    font-size: 28px;
+    margin: 0 0 14px;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .card p {
+    font-size: 18px;
+    line-height: 1.65;
+    margin: 8px 0;
+    color: var(--ink);
+  }
+  .card .big {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 28px;
+    text-align: center;
+    color: var(--purple);
+    line-height: 1.3;
+    margin: 14px 0;
+  }
+
+  /* ═══════ 버튼 ═══════ */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    margin: 14px 0;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    letter-spacing: 0;
+    color: #fff;
+    box-shadow: 0 5px 0 var(--ink);
+  }
+  .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
+  .btn-primary { background: linear-gradient(135deg, var(--pink), var(--orange)); }
+  .btn-secondary { background: linear-gradient(135deg, var(--cyan), var(--purple)); }
+  .btn-success { background: linear-gradient(135deg, var(--green), var(--cyan)); }
+  .btn-yellow { background: linear-gradient(135deg, var(--yellow), var(--orange)); color: var(--ink); }
+
+  /* ═══════ 점수 팝업 ═══════ */
+  .score-pop {
+    position: fixed;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 36px;
+    color: var(--pink);
+    -webkit-text-stroke: 2px #fff;
+    pointer-events: none;
+    z-index: 1000;
+    animation: scorePop 1s ease-out forwards;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  }
+  @keyframes scorePop {
+    0% { transform: translateY(0) scale(0.5) rotate(-10deg); opacity: 1; }
+    50% { transform: translateY(-50px) scale(1.3) rotate(5deg); opacity: 1; }
+    100% { transform: translateY(-120px) scale(1) rotate(-5deg); opacity: 0; }
+  }
+
+  /* ═══════ 스테이지 보드 ═══════ */
+  .stage-board {
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 0 var(--ink);
+    overflow-x: auto;
+  }
+  .stage-track {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    gap: 4px;
+  }
+  .stage-track::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 4%;
+    right: 4%;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px);
+    z-index: 0;
+  }
+  .stage-node {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 0 var(--ink);
+    flex-shrink: 0;
+  }
+  .stage-node.active {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    color: #fff;
+    transform: scale(1.2);
+    box-shadow: 0 4px 0 var(--ink), 0 0 0 6px rgba(255, 90, 140, 0.2);
+    animation: pulse 1.5s infinite;
+  }
+  .stage-node.done {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1.2); }
+    50% { transform: scale(1.3); }
+  }
+
+  /* ═══════ 콤보 ═══════ */
+  .combo-indicator {
+    position: fixed;
+    top: 90px;
+    right: 14px;
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: var(--ink);
+    padding: 10px 16px;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 18px;
+    box-shadow: 0 4px 0 var(--ink);
+    z-index: 99;
+    transform: scale(0) rotate(-15deg);
+    transition: transform 0.3s cubic-bezier(0.34, 1.8, 0.64, 1);
+  }
+  .combo-indicator.show { transform: scale(1) rotate(-5deg); }
+
+  /* ═══════ 객관식 ═══════ */
+  .choice-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .choice {
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    padding: 18px 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'Jua', sans-serif;
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--ink);
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .choice:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+  .choice:hover { background: var(--yellow-light); }
+  .choice.correct {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff;
+    animation: correctPulse 0.5s ease;
+  }
+  .choice.wrong {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    color: #fff;
+    animation: shake 0.4s;
+  }
+  @keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04) rotate(-1deg); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px) rotate(-2deg); }
+    75% { transform: translateX(10px) rotate(2deg); }
+  }
+  .choice .choice-icon { font-size: 24px; margin-right: 6px; vertical-align: middle; }
+
+  /* ═══════ 사건 ═══════ */
+  .scene-emoji {
+    font-size: 70px;
+    text-align: center;
+    margin: 16px 0;
+    line-height: 1;
+    letter-spacing: -10px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-12px) rotate(3deg); }
+  }
+
+  .speech-bubble {
+    padding: 16px 18px;
+    border-radius: 18px;
+    margin: 14px 0;
+    font-family: 'Jua', sans-serif;
+    font-size: 19px;
+    line-height: 1.45;
+    position: relative;
+    border: 3px solid var(--ink);
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .speech-bubble.parent {
+    background: linear-gradient(135deg, #ffdde6, #ffc4d2);
+    margin-right: 50px;
+    margin-left: 50px;
+    border-radius: 8px 18px 18px 18px;
+  }
+  .speech-bubble.parent::before {
+    content: '👩‍🦱';
+    position: absolute;
+    left: -50px;
+    top: 0;
+    font-size: 36px;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 0 var(--ink);
+  }
+  .speech-bubble.child {
+    background: linear-gradient(135deg, #d4eaff, #b8dcff);
+    margin-left: 50px;
+    margin-right: 50px;
+    border-radius: 18px 8px 18px 18px;
+  }
+  .speech-bubble.child::before {
+    content: '👧';
+    position: absolute;
+    right: -50px;
+    top: 0;
+    font-size: 36px;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 0 var(--ink);
+  }
+
+  /* ═══════ 결과 ═══════ */
+  .result-trophy {
+    font-size: 110px;
+    text-align: center;
+    line-height: 1;
+    margin: 18px 0 0;
+    animation: trophyBounce 1.5s ease-in-out infinite;
+  }
+  @keyframes trophyBounce {
+    0%, 100% { transform: translateY(0) rotate(-8deg) scale(1); }
+    50% { transform: translateY(-18px) rotate(8deg) scale(1.05); }
+  }
+  .final-score {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 80px;
+    text-align: center;
+    color: var(--pink);
+    text-shadow: 4px 4px 0 var(--ink);
+    margin: 14px 0;
+    line-height: 1;
+  }
+  .rank-title {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 32px;
+    text-align: center;
+    color: var(--purple);
+    margin: 12px 0;
+    letter-spacing: 1px;
+    text-shadow: 3px 3px 0 var(--yellow);
+  }
+
+  /* ═══════ 단어 그리드 ═══════ */
+  .word-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .word-bubble {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-light), var(--cyan-light));
+    border: 3px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 17px;
+    color: var(--ink);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 4px;
+    line-height: 1.2;
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .word-bubble:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+  .word-bubble:hover { transform: scale(1.05); }
+  .word-bubble.correct {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff;
+    transform: scale(1.1) rotate(5deg);
+    pointer-events: none;
+    box-shadow: 0 4px 0 var(--ink), 0 0 0 5px rgba(6, 214, 160, 0.3);
+  }
+  .word-bubble.wrong {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    color: #fff;
+    animation: shake 0.4s;
+  }
+
+  /* ═══════ 배지 ═══════ */
+  .badge {
+    display: inline-block;
+    background: var(--yellow);
+    color: var(--ink);
+    padding: 5px 12px;
+    border-radius: 14px;
+    border: 2px solid var(--ink);
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 14px;
+    margin: 3px;
+    box-shadow: 0 2px 0 var(--ink);
+  }
+  .badge.pink { background: var(--pink-light); }
+  .badge.cyan { background: var(--cyan-light); }
+  .badge.purple { background: var(--purple-light); }
+
+  .mini-prog {
+    text-align: center;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 17px;
+    color: var(--pink);
+    margin: 10px 0;
+    letter-spacing: 1px;
+  }
+
+  /* ═══════ 모달 ═══════ */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(42, 38, 64, 0.65);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal.show { display: flex; }
+  .modal-content {
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 22px;
+    padding: 28px 22px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 0 var(--ink), 0 12px 30px rgba(0,0,0,0.3);
+    animation: modalIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+  }
+  .modal h3 {
+    font-size: 28px;
+    margin: 0 0 12px;
+    color: var(--pink);
+  }
+  .modal p { font-size: 17px; line-height: 1.6; margin: 10px 0; color: var(--ink); }
+
+  /* ═══════ 파티클 ═══════ */
+  .particle { position: fixed; pointer-events: none; z-index: 999; animation: particleFly 1s ease-out forwards; }
+  @keyframes particleFly {
+    0% { opacity: 1; transform: scale(0.5) rotate(0); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.5) rotate(360deg); }
+  }
+
+  /* ═══════ 강조 박스 ═══════ */
+  .highlight-box {
+    background: linear-gradient(135deg, var(--yellow-light), var(--pink-light));
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    box-shadow: 0 3px 0 var(--ink);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .highlight-box.cyan { background: linear-gradient(135deg, var(--cyan-light), #d6ecff); }
+  .highlight-box.purple { background: linear-gradient(135deg, var(--purple-light), #e8d5ff); }
+  .highlight-box.green { background: linear-gradient(135deg, var(--green-light), #d4f5e3); }
+
+  /* ═══════ 카드 매칭 (Stage 2) ═══════ */
+  .match-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .match-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .match-col-title {
+    font-family: 'Do Hyeon', sans-serif;
+    text-align: center;
+    color: var(--purple);
+    font-size: 18px;
+    padding: 6px;
+    background: var(--purple-light);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 0 3px 0 var(--ink);
+  }
+  .match-card {
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'Jua', sans-serif;
+    font-size: 17px;
+    line-height: 1.35;
+    color: var(--ink);
+    box-shadow: 0 4px 0 var(--ink);
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .match-card.term {
+    background: linear-gradient(135deg, #fff, var(--cyan-light));
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 18px;
+  }
+  .match-card:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+  .match-card.selected {
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--ink);
+  }
+  .match-card.matched {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff;
+    pointer-events: none;
+    box-shadow: 0 4px 0 var(--ink), 0 0 0 4px rgba(6, 214, 160, 0.3);
+  }
+  .match-card.wrong-flash {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    color: #fff;
+    animation: shake 0.4s;
+  }
+
+  /* ═══════ 텍스트 입력 (Stage 7 작문) ═══════ */
+  .write-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 14px;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    font-family: 'Jua', sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    background: #fff;
+    color: var(--ink);
+    resize: vertical;
+    box-shadow: 0 4px 0 var(--ink);
+    margin: 8px 0;
+  }
+  .write-input:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 4px 0 var(--ink), 0 0 0 3px rgba(255, 90, 140, 0.2);
+  }
+  .write-label {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 19px;
+    color: var(--purple);
+    margin: 14px 0 4px;
+    display: block;
+  }
+  .word-count {
+    text-align: right;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    font-family: 'Do Hyeon', sans-serif;
+  }
+
+  /* ═══════ 필수 키워드 칩 ═══════ */
+  .must-words {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 6px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+  .word-chip {
+    display: inline-block;
+    background: #fff;
+    border: 2px solid var(--orange);
+    color: var(--orange);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 14px;
+    box-shadow: 0 2px 0 var(--orange);
+    transition: all 0.3s;
+  }
+  .word-chip.hit {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff;
+    border-color: var(--ink);
+    box-shadow: 0 2px 0 var(--ink);
+    animation: chipPop 0.4s;
+  }
+  @keyframes chipPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2) rotate(-5deg); }
+    100% { transform: scale(1); }
+  }
+
+  /* 난이도 배지 */
+  .diff-badge {
+    display: inline-block;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 2px solid var(--ink);
+    box-shadow: 0 2px 0 var(--ink);
+  }
+  .diff-badge.easy { background: var(--green-light); color: var(--ink); }
+  .diff-badge.medium { background: var(--yellow); color: var(--ink); }
+  .diff-badge.hard { background: var(--pink-light); color: var(--ink); }
+
+  /* ═══════ 철학자 카드 ═══════ */
+  .phil-card {
+    background: linear-gradient(135deg, #fff, var(--purple-light));
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 18px;
+    margin: 10px 0;
+    box-shadow: 0 4px 0 var(--ink);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .phil-card .phil-emoji { font-size: 50px; text-align: center; display: block; margin-bottom: 8px; }
+  .phil-card h3 {
+    text-align: center;
+    color: var(--purple);
+    font-size: 24px;
+    margin: 4px 0;
+  }
+
+  /* ═══════ 빈칸 퀴즈 (Stage 6) ═══════ */
+  .quiz-box {
+    background: #fff;
+    border: 2.5px dashed var(--purple);
+    border-radius: 14px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .quiz-blank {
+    display: inline-block;
+    min-width: 60px;
+    padding: 2px 12px;
+    margin: 0 2px;
+    border-bottom: 3px solid var(--purple);
+    font-family: 'Do Hyeon', sans-serif;
+    color: var(--pink);
+    font-size: 18px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .quiz-blank.filled-correct {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff;
+    border-bottom: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 0 var(--ink);
+    animation: blinkIn 0.4s;
+  }
+  @keyframes blinkIn {
+    0% { transform: scale(0.5); }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  .quiz-choices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .quiz-opt {
+    background: #fff;
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 17px;
+    color: var(--ink);
+    box-shadow: 0 3px 0 var(--ink);
+    transition: all 0.15s ease;
+  }
+  .quiz-opt:hover { background: var(--yellow-light); }
+  .quiz-opt:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+  .quiz-opt.used {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff;
+    pointer-events: none;
+  }
+  .quiz-opt.wrong-flash {
+    background: linear-gradient(135deg, var(--pink), var(--orange));
+    color: #fff;
+    animation: shake 0.4s;
+  }
+  .quiz-result {
+    text-align: center;
+    margin-top: 10px;
+    min-height: 24px;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 17px;
+  }
+  .quiz-result.success { color: var(--green); }
+  .quiz-result.fail { color: var(--pink); }
+
+  @media (max-width: 380px) {
+    h1.game-title { font-size: 44px; }
+    .card h2 { font-size: 24px; }
+    .card .big { font-size: 24px; }
+    .btn { font-size: 19px; padding: 16px; }
+    .word-bubble { font-size: 14px; }
+    .speech-bubble.parent { margin-right: 0; }
+    .speech-bubble.child { margin-left: 0; }
+    .match-card { font-size: 14px; padding: 10px 6px; }
+    .match-card.term { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="game">
+
+  <!-- HUD -->
+  <div class="hud" id="hud" style="display:none;">
+    <div class="hud-item">
+      <span class="hud-label">🏆 점수</span>
+      <span class="hud-value" id="scoreVal">0</span>
+    </div>
+    <div class="level-badge" id="levelBadge">🥚 수습생</div>
+    <div class="hud-item">
+      <span class="hud-label">STAGE</span>
+      <span class="hud-value" id="stageVal">1/8</span>
+    </div>
+  </div>
+
+  <div class="combo-indicator" id="comboInd">🔥 콤보 x2!</div>
+
+  <!-- ═══════ 시작 화면 ═══════ -->
+  <div class="screen active" id="s0">
+    <h1 class="game-title">⚖️ 법정 영웅</h1>
+    <div class="subtitle">★ JUDGE HERO ★</div>
+
+    <div class="card pop-pink">
+      <h2 style="text-align:center; color: var(--pink);">📱 판례 01</h2>
+      <p class="big" style="font-size: 24px;">엄마는 다 알아야 해!<br>vs<br>내 사생활이에요!</p>
+      <p style="text-align:center; color: var(--ink-soft); font-size: 15px; margin-top: 12px;">
+        2016년 국가인권위원회 결정<br>휴대폰 잠금해제 사건
+      </p>
+    </div>
+
+    <div class="card pop-yellow">
+      <h2 style="text-align:center;">🎮 어떻게 하나요?</h2>
+      <p style="text-align:center; font-size: 17px;">
+        8개 스테이지를 통과해서<br>
+        <b style="color: var(--pink);">대법관</b>까지 올라가요!
+      </p>
+      <div style="text-align: center; margin: 14px 0;">
+        <span class="badge">📚 정답 +점수</span>
+        <span class="badge pink">🔥 콤보 보너스</span>
+        <span class="badge cyan">⚡ 레벨업</span>
+      </div>
+    </div>
+
+    <div class="card pop-purple">
+      <h2 style="text-align:center; font-size: 22px;">🏅 등급 시스템</h2>
+      <p style="font-size: 15px; line-height: 1.8; text-align: center;">
+        🥚 <b>수습생</b> (0점~)<br>
+        🐣 <b>견습 변호사</b> (150점~)<br>
+        🐤 <b>정식 변호사</b> (300점~)<br>
+        🦅 <b>법정의 영웅</b> (500점~)<br>
+        ⚖️ <b style="color: var(--pink);">대법관</b> (700점~)
+      </p>
+      <p style="text-align:center; font-size:14px; color:var(--ink-soft); margin-top:10px;">
+        ✨ 대법관은 <b>판결문과 짧은 글짓기까지</b><br>완벽히 채워야 도달할 수 있어요!
+      </p>
+    </div>
+
+    <div class="card pop-cyan">
+      <h2 style="text-align:center; font-size: 22px;">🎯 8단계 미션</h2>
+      <p style="font-size: 15px; line-height: 1.9;">
+        🔍 <b>1</b> · 사건 추적 (단어 사냥)<br>
+        📚 <b>2</b> · 법 용어 학습 (짝 맞추기)<br>
+        ⚖️ <b>3</b> · 권리 가르기 (객관식)<br>
+        🥊 <b>4</b> · 1라운드 공방<br>
+        🥊 <b>5</b> · 2라운드 공방<br>
+        🤔 <b>6</b> · 철학자의 조언<br>
+        ✏️ <b>7</b> · 판결문 작성<br>
+        🏆 <b>8</b> · 최종 평결
+      </p>
+    </div>
+
+    <button class="btn btn-primary" onclick="startGame()">▶ 게임 시작!</button>
+  </div>
+
+  <!-- ═══════ Stage 1: 사건 추적 ═══════ -->
+  <div class="screen" id="s1">
+    <div class="stage-board"><div class="stage-track" id="board1"></div></div>
+
+    <div class="card pop-yellow">
+      <h2 style="text-align:center;">🔍 1단계 · 사건 추적</h2>
+      <div class="scene-emoji">🌙 💤 📱</div>
+      <p style="text-align:center; font-size:17px;">
+        어느 밤, 수아가 잠든 사이...<br>
+        <b>엄마가 잠금된 폰을 열어<br>메시지를 봤어요.</b>
+      </p>
+      <div class="highlight-box" style="text-align:center;">
+        ⚡ 이 사건의 <b style="color:var(--pink);">핵심 단어 3개</b>를 찾아라!
+      </div>
+      <div class="mini-prog" id="s1Prog">🎯 발견: 0 / 3</div>
+    </div>
+
+    <div class="word-grid" id="wordGrid">
+      <div class="word-bubble" data-correct="1" onclick="hitWord(this, true)">잠금<br>해제</div>
+      <div class="word-bubble" data-correct="0" onclick="hitWord(this, false)">학교<br>숙제</div>
+      <div class="word-bubble" data-correct="1" onclick="hitWord(this, true)">사생활</div>
+      <div class="word-bubble" data-correct="0" onclick="hitWord(this, false)">아침<br>식사</div>
+      <div class="word-bubble" data-correct="1" onclick="hitWord(this, true)">허락<br>없이</div>
+      <div class="word-bubble" data-correct="0" onclick="hitWord(this, false)">놀이터</div>
+      <div class="word-bubble" data-correct="0" onclick="hitWord(this, false)">생일</div>
+      <div class="word-bubble" data-correct="0" onclick="hitWord(this, false)">날씨</div>
+      <div class="word-bubble" data-correct="0" onclick="hitWord(this, false)">동물</div>
+    </div>
+
+    <button class="btn btn-primary" id="s1Next" onclick="goStage(2)" style="display:none;">
+      다음 → 법 용어 학습
+    </button>
+  </div>
+
+  <!-- ═══════ Stage 2: 법 용어 짝 맞추기 ═══════ -->
+  <div class="screen" id="s2">
+    <div class="stage-board"><div class="stage-track" id="board2"></div></div>
+
+    <div class="card pop-purple">
+      <h2 style="text-align:center;">📚 2단계 · 법 용어 학습</h2>
+      <p style="text-align:center; font-size:17px;">
+        법정에서 쓰이는 <b style="color: var(--purple);">중요한 단어 4개</b>를<br>
+        뜻과 짝지어 봐요!
+      </p>
+      <div class="highlight-box purple" style="text-align:center;">
+        ⚡ 왼쪽 단어와 오른쪽 뜻을 차례로 <b>탭</b>해서 연결!
+      </div>
+      <div class="mini-prog" id="s2Prog">🔗 짝: 0 / 4</div>
+    </div>
+
+    <div class="match-area">
+      <div class="match-col">
+        <div class="match-col-title">📖 용어</div>
+        <div class="match-card term" data-key="A" onclick="matchSelect(this, 'term')">사생활</div>
+        <div class="match-card term" data-key="B" onclick="matchSelect(this, 'term')">친권</div>
+        <div class="match-card term" data-key="C" onclick="matchSelect(this, 'term')">헌법<br>17조</div>
+        <div class="match-card term" data-key="D" onclick="matchSelect(this, 'term')">통신의<br>비밀</div>
+      </div>
+      <div class="match-col">
+        <div class="match-col-title">💡 뜻</div>
+        <div class="match-card def" data-key="C" onclick="matchSelect(this, 'def')">국민의 사생활을<br>보호한다는 법</div>
+        <div class="match-card def" data-key="A" onclick="matchSelect(this, 'def')">남에게 보이고<br>싶지 않은 내 생활</div>
+        <div class="match-card def" data-key="D" onclick="matchSelect(this, 'def')">전화·메시지를<br>몰래 보면 안 됨</div>
+        <div class="match-card def" data-key="B" onclick="matchSelect(this, 'def')">부모가 아이를<br>돌볼 권리·의무</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="s2Next" onclick="goStage(3)" style="display:none;">
+      다음 → 권리 가르기
+    </button>
+  </div>
+
+  <!-- ═══════ Stage 3: 권리 가르기 ═══════ -->
+  <div class="screen" id="s3">
+    <div class="stage-board"><div class="stage-track" id="board3"></div></div>
+
+    <div class="card pop-cyan">
+      <h2 style="text-align:center;">⚖️ 3단계 · 권리 가르기</h2>
+      <p style="text-align:center; font-size:17px;">
+        이 사건에서 <b style="color: var(--cyan);">가장 세게 부딪히는 권리</b>는 뭘까?
+      </p>
+      <div class="highlight-box cyan" style="text-align:center;">
+        ⚡ 보기 중 <b style="color:var(--purple);">2개</b>를 골라봐!
+      </div>
+      <div class="mini-prog" id="s3Prog">⚡ 선택: 0 / 2</div>
+    </div>
+
+    <div class="choice-list" id="s3Choices">
+      <div class="choice" data-correct="0" onclick="pickChoice(this)">
+        <span class="choice-icon">👫</span>친구를 사귈 권리
+      </div>
+      <div class="choice" data-correct="1" onclick="pickChoice(this)">
+        <span class="choice-icon">🔒</span>나만의 비밀을 가질 권리
+      </div>
+      <div class="choice" data-correct="1" onclick="pickChoice(this)">
+        <span class="choice-icon">🛡️</span>아이를 위험으로부터 지킬 책임
+      </div>
+      <div class="choice" data-correct="0" onclick="pickChoice(this)">
+        <span class="choice-icon">🎨</span>부모의 취미를 즐길 자유
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="s3Next" onclick="goStage(4)" style="display:none;">
+      법정 1라운드 →
+    </button>
+  </div>
+
+  <!-- ═══════ Stage 4, 5: 공방 ═══════ -->
+  <div class="screen" id="s4">
+    <div class="stage-board"><div class="stage-track" id="board4"></div></div>
+
+    <div class="card pop-pink">
+      <h2 style="text-align:center;">🥊 4단계 · 1라운드</h2>
+      <p class="big" style="font-size:24px; color: var(--pink);">
+        "어린이도<br>사생활이 있을까?"
+      </p>
+    </div>
+
+    <div id="round1-area"></div>
+
+    <button class="btn btn-primary" id="s4Next" onclick="goStage(5)" style="display:none;">
+      2라운드 시작 →
+    </button>
+  </div>
+
+  <div class="screen" id="s5">
+    <div class="stage-board"><div class="stage-track" id="board5"></div></div>
+
+    <div class="card pop-pink">
+      <h2 style="text-align:center;">🥊 5단계 · 2라운드</h2>
+      <p class="big" style="font-size:24px; color: var(--pink);">
+        "걱정되면 몰래<br>봐도 괜찮을까?"
+      </p>
+    </div>
+
+    <div id="round2-area"></div>
+
+    <button class="btn btn-primary" id="s5Next" onclick="goStage(6)" style="display:none;">
+      철학자의 조언 →
+    </button>
+  </div>
+
+  <!-- ═══════ Stage 6: 철학자 카드 잠금해제 ═══════ -->
+  <div class="screen" id="s6">
+    <div class="stage-board"><div class="stage-track" id="board6"></div></div>
+
+    <div class="card pop-purple">
+      <h2 style="text-align:center;">🤔 6단계 · 철학자의 조언</h2>
+      <p style="text-align:center; font-size:17px;">
+        3명의 철학자가 이 사건을<br>
+        어떻게 봤을까요?<br>
+        <b style="color: var(--purple);">빈칸의 알맞은 단어</b>를 골라요!
+      </p>
+      <div class="highlight-box purple" style="text-align:center;">
+        💎 정답마다 <b>+20점</b> · 3개 다 맞으면 보너스!
+      </div>
+      <div class="mini-prog" id="s6Prog">🧩 완성: 0 / 3</div>
+    </div>
+
+    <!-- 벤담 -->
+    <div class="phil-card open" id="philCard0">
+      <span class="phil-emoji">👁️</span>
+      <h3>제레미 벤담</h3>
+      <p style="font-size:15px; color:var(--ink); margin:8px 0;">
+        벤담은 죄수들이 한가운데 감시탑에서 자신을 보고 있을지도 모른다고 두려워하는 원형 감옥(<b>파놉티콘</b>)을 떠올렸어요.
+      </p>
+      <div class="quiz-box" id="quizPhil0">
+        <p style="font-size:16px; line-height:1.7; color:var(--ink);">
+          벤담의 생각:<br>
+          "감시받고 있다는 <span class="quiz-blank" id="blank-0">?</span>만으로도<br>사람은 <span class="quiz-blank" id="blank-0b">?</span>를 잃는다."
+        </p>
+        <p style="font-size:14px; color:var(--ink-soft); margin-top:8px;">
+          ↓ 아래 보기에서 <b>알맞은 단어</b>를 차례로 골라봐요
+        </p>
+        <div class="quiz-choices">
+          <div class="quiz-opt" data-phil="0" data-key="자유" onclick="pickPhilWord(this)">자유</div>
+          <div class="quiz-opt" data-phil="0" data-key="용기" onclick="pickPhilWord(this)">용기</div>
+          <div class="quiz-opt" data-phil="0" data-key="느낌" onclick="pickPhilWord(this)">느낌</div>
+          <div class="quiz-opt" data-phil="0" data-key="기쁨" onclick="pickPhilWord(this)">기쁨</div>
+        </div>
+        <div class="quiz-result" id="result-0"></div>
+      </div>
+    </div>
+
+    <!-- 칸트 -->
+    <div class="phil-card open" id="philCard1">
+      <span class="phil-emoji">⚖️</span>
+      <h3>이마누엘 칸트</h3>
+      <p style="font-size:15px; color:var(--ink); margin:8px 0;">
+        칸트는 "좋은 결과를 위해서라도 <b>사람을 도구처럼 다루면 안 된다</b>"고 말했어요.
+      </p>
+      <div class="quiz-box" id="quizPhil1">
+        <p style="font-size:16px; line-height:1.7; color:var(--ink);">
+          칸트의 생각:<br>
+          "사람은 <span class="quiz-blank" id="blank-1">?</span>이 아니라<br>그 자체로 <span class="quiz-blank" id="blank-1b">?</span>이다."
+        </p>
+        <p style="font-size:14px; color:var(--ink-soft); margin-top:8px;">
+          ↓ 빈칸에 들어갈 단어를 골라봐요
+        </p>
+        <div class="quiz-choices">
+          <div class="quiz-opt" data-phil="1" data-key="목적" onclick="pickPhilWord(this)">목적</div>
+          <div class="quiz-opt" data-phil="1" data-key="수단" onclick="pickPhilWord(this)">수단</div>
+          <div class="quiz-opt" data-phil="1" data-key="물건" onclick="pickPhilWord(this)">물건</div>
+          <div class="quiz-opt" data-phil="1" data-key="친구" onclick="pickPhilWord(this)">친구</div>
+        </div>
+        <div class="quiz-result" id="result-1"></div>
+      </div>
+    </div>
+
+    <!-- 밀 -->
+    <div class="phil-card open" id="philCard2">
+      <span class="phil-emoji">🌱</span>
+      <h3>존 스튜어트 밀</h3>
+      <p style="font-size:15px; color:var(--ink); margin:8px 0;">
+        밀은 "남에게 <b>해를 끼치지 않는다면</b>, 내 일은 내가 결정한다"고 했어요.
+      </p>
+      <div class="quiz-box" id="quizPhil2">
+        <p style="font-size:16px; line-height:1.7; color:var(--ink);">
+          밀의 생각:<br>
+          "<span class="quiz-blank" id="blank-2">?</span>에 관한 일은<br><span class="quiz-blank" id="blank-2b">?</span>가 결정하는 것이 자유다."
+        </p>
+        <p style="font-size:14px; color:var(--ink-soft); margin-top:8px;">
+          ↓ 빈칸에 들어갈 단어를 골라봐요
+        </p>
+        <div class="quiz-choices">
+          <div class="quiz-opt" data-phil="2" data-key="자기 자신" onclick="pickPhilWord(this)">자기 자신</div>
+          <div class="quiz-opt" data-phil="2" data-key="가족" onclick="pickPhilWord(this)">가족</div>
+          <div class="quiz-opt" data-phil="2" data-key="자기" onclick="pickPhilWord(this)">자기</div>
+          <div class="quiz-opt" data-phil="2" data-key="친구" onclick="pickPhilWord(this)">친구</div>
+        </div>
+        <div class="quiz-result" id="result-2"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="s6Next" onclick="goStage(7)" style="display:none;">
+      판결문 쓰러 가기 →
+    </button>
+  </div>
+
+  <!-- ═══════ Stage 7: 작문 ═══════ -->
+  <div class="screen" id="s7">
+    <div class="stage-board"><div class="stage-track" id="board7"></div></div>
+
+    <div class="card pop-green">
+      <h2 style="text-align:center;">✏️ 7단계 · 판결문 작성</h2>
+      <p style="text-align:center; font-size:17px;">
+        이제 내가 <b style="color: var(--green);">진짜 판사</b>가 되어<br>
+        판결문을 써봐요!
+      </p>
+      <div class="highlight-box green" style="text-align:center;">
+        💎 <b>주장 + 근거</b>를 나누어 써요!<br>
+        각각 따로 채점돼요
+      </div>
+    </div>
+
+    <!-- 판결문: 주장 -->
+    <div class="card">
+      <h3 style="text-align:center; color:var(--green); font-size:22px; margin: 0 0 8px;">📜 ① 나의 주장</h3>
+      <p style="font-size:14px; color:var(--ink-soft); text-align:center; margin: 0 0 8px;">
+        예: "엄마는 수아의 폰을 함부로 봐서는 안 된다."
+      </p>
+      <div class="must-words" id="mustClaim">
+        🎯 들어가면 +5점 단어:
+        <span class="word-chip" data-word="허락">허락</span>
+        <span class="word-chip" data-word="사생활">사생활</span>
+        <span class="word-chip" data-word="동의">동의</span>
+      </div>
+      <textarea class="write-input" id="writeClaim" oninput="checkWrite('writeClaim', 'ccClaim', 'mustClaim')"
+        placeholder="주장을 한 문장으로 써봐요..."></textarea>
+      <div class="word-count" id="ccClaim">0자 · 0/3 단어</div>
+    </div>
+
+    <!-- 판결문: 근거 -->
+    <div class="card">
+      <h3 style="text-align:center; color:var(--green); font-size:22px; margin: 0 0 8px;">💡 ② 나의 근거</h3>
+      <p style="font-size:14px; color:var(--ink-soft); text-align:center; margin: 0 0 8px;">
+        예: "왜냐하면 헌법은 모든 국민의 사생활을 보호하기 때문이다."
+      </p>
+      <div class="must-words" id="mustGround">
+        🎯 들어가면 +5점 단어:
+        <span class="word-chip" data-word="헌법">헌법</span>
+        <span class="word-chip" data-word="신뢰">신뢰</span>
+        <span class="word-chip" data-word="권리">권리</span>
+      </div>
+      <textarea class="write-input" id="writeGround" oninput="checkWrite('writeGround', 'ccGround', 'mustGround')"
+        placeholder="왜 그렇게 생각하는지 써봐요..."></textarea>
+      <div class="word-count" id="ccGround">0자 · 0/3 단어</div>
+    </div>
+
+    <!-- 짧은 글짓기: 3개 중 선택 -->
+    <div class="card pop-yellow">
+      <h2 style="text-align:center; font-size:22px;">📝 짧은 글짓기 챌린지</h2>
+      <p style="text-align:center; font-size:15px; color:var(--ink-soft);">
+        세 가지 중 <b>마음에 드는 걸 골라서</b> 써봐요!<br>
+        <b style="color:var(--pink);">다 쓰면 보너스 점수!</b>
+      </p>
+    </div>
+
+    <!-- 쉬움 -->
+    <div class="card" style="border-top: 12px solid var(--green);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="diff-badge easy">⭐ 쉬움 (+15)</span>
+      </div>
+      <h3 style="font-size:18px; margin: 6px 0;">🌟 우리 집 약속 만들기</h3>
+      <p style="font-size:15px; color:var(--ink); margin: 4px 0 8px;">
+        "부모님과 폰에 대해 어떤 약속을 만들면 좋을까?"
+      </p>
+      <div class="must-words" id="mustEasy">
+        🎯 키워드:
+        <span class="word-chip" data-word="약속">약속</span>
+        <span class="word-chip" data-word="대화">대화</span>
+      </div>
+      <textarea class="write-input" id="writeEasy" oninput="checkWrite('writeEasy', 'ccEasy', 'mustEasy')"
+        placeholder="우리 집 폰 약속 아이디어..."></textarea>
+      <div class="word-count" id="ccEasy">0자 · 0/2 단어</div>
+    </div>
+
+    <!-- 중간 -->
+    <div class="card" style="border-top: 12px solid var(--yellow);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="diff-badge medium">⭐⭐ 중간 (+25)</span>
+      </div>
+      <h3 style="font-size:18px; margin: 6px 0;">💌 부모님께 편지 쓰기</h3>
+      <p style="font-size:15px; color:var(--ink); margin: 4px 0 8px;">
+        "내 폰을 몰래 보신 부모님께 진심으로 편지를 써본다면?"
+      </p>
+      <div class="must-words" id="mustMedium">
+        🎯 키워드:
+        <span class="word-chip" data-word="속상">속상</span>
+        <span class="word-chip" data-word="신뢰">신뢰</span>
+        <span class="word-chip" data-word="이해">이해</span>
+      </div>
+      <textarea class="write-input" id="writeMedium" oninput="checkWrite('writeMedium', 'ccMedium', 'mustMedium')"
+        placeholder="부모님께 보내는 편지..."></textarea>
+      <div class="word-count" id="ccMedium">0자 · 0/3 단어</div>
+    </div>
+
+    <!-- 어려움 -->
+    <div class="card" style="border-top: 12px solid var(--pink);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="diff-badge hard">⭐⭐⭐ 어려움 (+40)</span>
+      </div>
+      <h3 style="font-size:18px; margin: 6px 0;">⚖️ 법으로 설득하기</h3>
+      <p style="font-size:15px; color:var(--ink); margin: 4px 0 8px;">
+        "헌법, 인권, 사생활 같은 단어를 써서 부모님을 설득해본다면?"
+      </p>
+      <div class="must-words" id="mustHard">
+        🎯 키워드:
+        <span class="word-chip" data-word="헌법">헌법</span>
+        <span class="word-chip" data-word="인권">인권</span>
+        <span class="word-chip" data-word="사생활">사생활</span>
+        <span class="word-chip" data-word="존중">존중</span>
+      </div>
+      <textarea class="write-input" id="writeHard" oninput="checkWrite('writeHard', 'ccHard', 'mustHard')"
+        placeholder="법적 근거로 설득하는 글..."></textarea>
+      <div class="word-count" id="ccHard">0자 · 0/4 단어</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitWrite()">제출 → 최종 평결!</button>
+  </div>
+
+  <!-- ═══════ Stage 8: 결과 ═══════ -->
+  <div class="screen" id="s8">
+    <div class="stage-board"><div class="stage-track" id="board8"></div></div>
+
+    <div class="result-trophy" id="trophyIcon">🏆</div>
+    <div class="rank-title" id="rankTitle">법정의 영웅!</div>
+    <div class="final-score" id="finalScore">0</div>
+    <p style="text-align:center; color:var(--purple); font-family:'Do Hyeon'; font-size:22px; margin: 0;">점</p>
+
+    <div class="card pop-yellow">
+      <h2 style="text-align:center;">⚖️ 법원의 진짜 판결</h2>
+      <p style="font-size:16px;">2016년 <b style="color:var(--pink);">국가인권위원회</b>는 이렇게 결정했어요:</p>
+      <div class="highlight-box" style="margin-top:12px; font-size:17px; text-align:center;">
+        <b style="color:var(--pink);">미성년자라도 사생활은<br>보호받아야 한다.</b><br><br>
+        부모도 자녀의 동의 없이<br>함부로 휴대폰을 열어보면 안 된다.
+      </div>
+      <p style="text-align:center; font-size:16px; color:var(--purple); margin-top:12px;">
+        🔓 너의 권리, 절대 잊지 마!
+      </p>
+    </div>
+
+    <div class="card pop-cyan">
+      <h2 style="text-align:center;">📝 내가 쓴 답안</h2>
+
+      <span class="write-label" style="font-size:17px;">📜 판결문 · 주장</span>
+      <div id="showClaim" style="background:#f0fff4; border:2px solid var(--ink); border-radius:12px; padding:12px; font-size:16px; min-height:50px; color:var(--ink);"></div>
+
+      <span class="write-label" style="font-size:17px;">💡 판결문 · 근거</span>
+      <div id="showGround" style="background:#f0fff4; border:2px solid var(--ink); border-radius:12px; padding:12px; font-size:16px; min-height:50px; color:var(--ink);"></div>
+
+      <span class="write-label" style="font-size:17px; color:var(--green);">⭐ 쉬움 · 우리 집 약속</span>
+      <div id="showEasy" style="background:#f0fff4; border:2px solid var(--ink); border-radius:12px; padding:12px; font-size:16px; min-height:40px; color:var(--ink);"></div>
+
+      <span class="write-label" style="font-size:17px; color:var(--orange);">⭐⭐ 중간 · 부모님께 편지</span>
+      <div id="showMedium" style="background:#fffbf0; border:2px solid var(--ink); border-radius:12px; padding:12px; font-size:16px; min-height:40px; color:var(--ink);"></div>
+
+      <span class="write-label" style="font-size:17px; color:var(--pink);">⭐⭐⭐ 어려움 · 법으로 설득</span>
+      <div id="showHard" style="background:#fff0f5; border:2px solid var(--ink); border-radius:12px; padding:12px; font-size:16px; min-height:40px; color:var(--ink);"></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="restartGame()">🔁 다시 도전!</button>
+    <button class="btn btn-secondary" onclick="window.scrollTo({top:0, behavior:'smooth'})">⬆ 처음으로</button>
+  </div>
+
+</div>
+
+<!-- 모달 -->
+<div class="modal" id="clearModal">
+  <div class="modal-content">
+    <div style="font-size:68px; line-height:1; margin-bottom:6px;" id="clearIcon">🎉</div>
+    <h3 id="clearTitle">스테이지 클리어!</h3>
+    <p id="clearMsg">잘했어요!</p>
+    <p style="font-family:'Do Hyeon'; font-size:36px; color:var(--pink); margin:12px 0; text-shadow:3px 3px 0 var(--yellow);" id="clearScore">+0</p>
+    <button class="btn btn-success" onclick="closeModal()" style="margin-top:6px;">계속 →</button>
+  </div>
+</div>
+
+
+<script>
+// ═══════════ 상태 ═══════════
+const TOTAL_STAGES = 8;
+let state = {
+  score: 0, stage: 0, combo: 0,
+  s1Found: 0, s3Picked: 0,
+  matched: 0, matchSel: { term: null, def: null },
+  round1Step: 0, round2Step: 0,
+  philOpen: 0,
+  written: { judge: '', short: '' }
+};
+
+const RANKS = [
+  { min: 0, name: '🥚 수습생' },
+  { min: 150, name: '🐣 견습 변호사' },
+  { min: 300, name: '🐤 정식 변호사' },
+  { min: 500, name: '🦅 법정의 영웅' },
+  { min: 700, name: '⚖️ 대법관' },
+];
+
+function updateHUD() {
+  document.getElementById('scoreVal').textContent = state.score;
+  document.getElementById('stageVal').textContent = state.stage + '/' + TOTAL_STAGES;
+  let rank = RANKS[0];
+  for (let r of RANKS) if (state.score >= r.min) rank = r;
+  document.getElementById('levelBadge').textContent = rank.name;
+}
+
+// 보드 노드 채우기 (8단계용)
+function renderBoards() {
+  for (let s = 1; s <= TOTAL_STAGES; s++) {
+    const board = document.getElementById('board' + s);
+    if (!board) continue;
+    board.innerHTML = '';
+    for (let i = 1; i <= TOTAL_STAGES; i++) {
+      const node = document.createElement('div');
+      node.className = 'stage-node';
+      if (i < s) { node.classList.add('done'); node.textContent = '✓'; }
+      else if (i === s) { node.classList.add('active'); node.textContent = (s === TOTAL_STAGES ? '🏆' : i); }
+      else { node.textContent = i; }
+      board.appendChild(node);
+    }
+  }
+}
+
+function addScore(pts, x, y) {
+  state.combo++;
+  let bonus = state.combo >= 3 ? Math.floor(pts * 0.5) : 0;
+  let total = pts + bonus;
+  state.score += total;
+  updateHUD();
+
+  const pop = document.createElement('div');
+  pop.className = 'score-pop';
+  pop.textContent = '+' + total;
+  pop.style.left = (x || window.innerWidth/2 - 30) + 'px';
+  pop.style.top = (y || window.innerHeight/2) + 'px';
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 1000);
+
+  if (state.combo >= 2) {
+    const c = document.getElementById('comboInd');
+    c.textContent = `🔥 콤보 x${state.combo}!`;
+    c.classList.add('show');
+    clearTimeout(window._comboTimer);
+    window._comboTimer = setTimeout(() => c.classList.remove('show'), 2000);
+  }
+
+  spawnParticles(x, y);
+}
+
+function resetCombo() {
+  state.combo = 0;
+  document.getElementById('comboInd').classList.remove('show');
+}
+
+function spawnParticles(x, y) {
+  const emojis = ['✨','⭐','💫','🌟','✦','💖'];
+  const colors = ['#ff5a8c', '#ffd93d', '#4ecdc4', '#8b5cf6', '#06d6a0'];
+  for (let i = 0; i < 10; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.left = (x || window.innerWidth/2) + 'px';
+    p.style.top = (y || window.innerHeight/2) + 'px';
+    p.style.fontSize = (18 + Math.random()*16) + 'px';
+    p.style.color = colors[Math.floor(Math.random()*colors.length)];
+    const ang = Math.random() * Math.PI * 2;
+    const dist = 80 + Math.random()*100;
+    p.style.setProperty('--dx', Math.cos(ang)*dist + 'px');
+    p.style.setProperty('--dy', Math.sin(ang)*dist + 'px');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+
+function startGame() {
+  document.getElementById('hud').style.display = 'flex';
+  goStage(1);
+}
+
+function goStage(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s' + n).classList.add('active');
+  state.stage = n;
+  resetCombo();
+  updateHUD();
+  renderBoards();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  if (n === 4) initRound(1);
+  if (n === 5) initRound(2);
+  if (n === 8) showResult();
+}
+
+// Stage 1: 단어 사냥
+function hitWord(el, correct) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  const rect = el.getBoundingClientRect();
+  if (correct) {
+    el.classList.add('correct');
+    state.s1Found++;
+    addScore(15, rect.left+rect.width/2, rect.top+rect.height/2);
+    document.getElementById('s1Prog').textContent = `🎯 발견: ${state.s1Found} / 3`;
+    if (state.s1Found >= 3) {
+      setTimeout(() => showModal('🎯', '단어 사냥 클리어!', '핵심 단어 3개 다 찾았어요!', '+5 보너스!'), 400);
+      state.score += 5; updateHUD();
+      document.getElementById('s1Next').style.display = 'block';
+    }
+  } else {
+    el.classList.add('wrong');
+    resetCombo();
+    setTimeout(() => el.classList.remove('wrong'), 600);
+  }
+}
+
+// Stage 2: 카드 매칭
+function matchSelect(el, type) {
+  if (el.classList.contains('matched')) return;
+
+  // 같은 컬럼 이전 선택 해제
+  if (state.matchSel[type] && state.matchSel[type] !== el) {
+    state.matchSel[type].classList.remove('selected');
+  }
+  el.classList.toggle('selected');
+  state.matchSel[type] = el.classList.contains('selected') ? el : null;
+
+  // 둘 다 선택되면 비교
+  if (state.matchSel.term && state.matchSel.def) {
+    const t = state.matchSel.term;
+    const d = state.matchSel.def;
+    if (t.dataset.key === d.dataset.key) {
+      // 정답
+      t.classList.remove('selected'); d.classList.remove('selected');
+      t.classList.add('matched'); d.classList.add('matched');
+      state.matched++;
+      const rect = t.getBoundingClientRect();
+      addScore(20, rect.left + 50, rect.top + 30);
+      document.getElementById('s2Prog').textContent = `🔗 짝: ${state.matched} / 4`;
+      state.matchSel = { term: null, def: null };
+      if (state.matched >= 4) {
+        setTimeout(() => showModal('📚', '용어 학습 완료!', '법 용어를 모두 익혔어요!', '+10 보너스!'), 400);
+        state.score += 10; updateHUD();
+        document.getElementById('s2Next').style.display = 'block';
+      }
+    } else {
+      // 오답
+      t.classList.add('wrong-flash'); d.classList.add('wrong-flash');
+      resetCombo();
+      setTimeout(() => {
+        t.classList.remove('wrong-flash', 'selected');
+        d.classList.remove('wrong-flash', 'selected');
+        state.matchSel = { term: null, def: null };
+      }, 700);
+    }
+  }
+}
+
+// Stage 3: 권리 선택
+function pickChoice(el) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  const correct = el.dataset.correct === '1';
+  const rect = el.getBoundingClientRect();
+  if (correct) {
+    el.classList.add('correct');
+    state.s3Picked++;
+    addScore(20, rect.left+50, rect.top+30);
+    document.getElementById('s3Prog').textContent = `⚡ 선택: ${state.s3Picked} / 2`;
+    if (state.s3Picked >= 2) {
+      setTimeout(() => showModal('⚡', '권리 가르기 완료!', '핵심 권리 2개를 정확히 골랐어요!', '+10 보너스!'), 400);
+      state.score += 10; updateHUD();
+      document.getElementById('s3Next').style.display = 'block';
+    }
+  } else {
+    el.classList.add('wrong');
+    state.score = Math.max(0, state.score - 5); updateHUD();
+    resetCombo();
+    setTimeout(() => el.classList.remove('wrong'), 600);
+  }
+}
+
+// Stage 4, 5: 공방 — 각 근거 = 한 페이지 단위로 처리
+// 부모 측 주장을 수아 답안 오답으로 끼워넣어 헷갈리게 만듦
+// 정답 위치를 매 문제마다 섞음
+const ROUNDS = [
+  // ━━━━━━━━━━ 1라운드: 어린이도 사생활? ━━━━━━━━━━
+  [
+    { parent: '수아는 아직 어려요.<br>어른의 보호가 필요해요!',
+      question: '🥊 수아 측 변호인! 자연스럽게 반박해보세요',
+      choices: [
+        { text: '"어린아이라서 더더욱<br>어른이 결정해야 해요."', correct: false }, // 사실은 부모 주장
+        { text: '"보호가 필요한 건 맞아요.<br>하지만 보호와 감시는 달라요.<br>어려도 자기만의 마음은 지켜져야 해요."', correct: true },
+        { text: '"수아는 다 컸어요.<br>이제 보호 같은 건 필요 없어요."', correct: false }, // 무리수
+      ]
+    },
+    { parent: '온라인엔 위험한 어른이 너무 많아요.<br>미리 알아야 위험을 막을 수 있어요!',
+      question: '🥊 부모의 걱정을 인정하면서 반론을 제기해보세요',
+      choices: [
+        { text: '"위험을 막는 방법은 많아요.<br>몰래 폰을 보는 게 아니라,<br>함께 이야기하는 게 진짜 보호예요."', correct: true },
+        { text: '"맞아요, 그래서 부모님이<br>먼저 확인해주시는 게 좋아요."', correct: false }, // 부모 측 주장
+        { text: '"인터넷을 아예 못 쓰게 하면<br>되잖아요."', correct: false }, // 극단적
+      ]
+    },
+  ],
+  // ━━━━━━━━━━ 2라운드: 몰래 봐도? ━━━━━━━━━━
+  [
+    { parent: '걱정될 때는 미리 확인해야죠.<br>사고가 난 뒤엔 이미 늦어요!',
+      question: '🥊 부모님의 마음을 인정하며 반박해보세요',
+      choices: [
+        { text: '"늦지 않으려면 미리 챙겨야죠.<br>그래서 자주 확인하는 게 맞아요."', correct: false }, // 부모 주장
+        { text: '"수아가 알아서 잘하니까<br>걱정하실 필요 없어요."', correct: false }, // 근거 약함
+        { text: '"걱정되는 마음은 이해해요.<br>그래도 양해를 구하고 보는 것과<br>몰래 보는 건 완전히 달라요."', correct: true },
+      ]
+    },
+    { parent: '대놓고 물어보면<br>아이가 다 숨기잖아요!',
+      question: '🥊 마지막 반론을 제기해보세요',
+      choices: [
+        { text: '"숨긴다는 건 신뢰가<br>부족하다는 뜻이에요.<br>몰래 보면 그 신뢰는<br>영영 회복되지 않아요."', correct: true },
+        { text: '"그러니까 몰래 봐서라도<br>꼭 확인하셔야죠."', correct: false }, // 부모 주장
+        { text: '"수아는 절대로<br>아무것도 숨기지 않아요."', correct: false }, // 근거 없는 호언
+      ]
+    },
+  ],
+];
+
+function initRound(round) {
+  const area = document.getElementById('round' + round + '-area');
+  area.innerHTML = '';
+  state['round' + round + 'Step'] = 0;
+  renderRoundPage(round);
+}
+
+function renderRoundPage(round) {
+  const steps = ROUNDS[round - 1];
+  const idx = state['round' + round + 'Step'];
+  const area = document.getElementById('round' + round + '-area');
+
+  if (idx >= steps.length) {
+    // 라운드 종료
+    document.getElementById('s' + (round + 3) + 'Next').style.display = 'block';
+    setTimeout(() => {
+      showModal('🏆', `${round}라운드 승리!`, '훌륭한 변론이었어요!', '+15 보너스!');
+      state.score += 15; updateHUD();
+    }, 400);
+    return;
+  }
+
+  // 이전 페이지 비우기 (한 페이지 = 한 근거)
+  area.innerHTML = '';
+
+  // 페이지 카운터
+  const counter = document.createElement('div');
+  counter.style.cssText = 'text-align:center; font-family:\'Do Hyeon\',sans-serif; font-size:16px; color:var(--pink); margin: 4px 0 12px; letter-spacing:1px;';
+  counter.innerHTML = `📍 ${idx + 1} / ${steps.length}`;
+  area.appendChild(counter);
+
+  const step = steps[idx];
+
+  // 부모 말풍선
+  const bubble = document.createElement('div');
+  bubble.className = 'speech-bubble parent';
+  bubble.innerHTML = step.parent;
+  area.appendChild(bubble);
+
+  // 질문 카드
+  const qCard = document.createElement('div');
+  qCard.className = 'highlight-box';
+  qCard.style.cssText = 'text-align:center; margin-top:18px;';
+  qCard.innerHTML = `<p style="font-family:'Do Hyeon'; font-size:19px; color:var(--ink); margin:0;">${step.question}</p>`;
+  area.appendChild(qCard);
+
+  // 선택지
+  const list = document.createElement('div');
+  list.className = 'choice-list';
+  step.choices.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'choice';
+    div.innerHTML = c.text;
+    div.onclick = () => handleRoundChoice(div, c.correct, round);
+    list.appendChild(div);
+  });
+  area.appendChild(list);
+}
+
+function handleRoundChoice(el, correct, round) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  const rect = el.getBoundingClientRect();
+  if (correct) {
+    el.classList.add('correct');
+    el.parentElement.querySelectorAll('.choice').forEach(c => c.style.pointerEvents = 'none');
+    addScore(25, rect.left+50, rect.top+20);
+
+    // 수아 답변 말풍선 표시
+    setTimeout(() => {
+      const area = document.getElementById('round' + round + '-area');
+      const childBubble = document.createElement('div');
+      childBubble.className = 'speech-bubble child';
+      childBubble.innerHTML = el.innerHTML;
+      area.appendChild(childBubble);
+      childBubble.scrollIntoView({behavior:'smooth', block:'center'});
+
+      const steps = ROUNDS[round - 1];
+      const idx = state['round' + round + 'Step'];
+      const isLast = (idx >= steps.length - 1);
+
+      if (isLast) {
+        // 마지막 근거: 안의 버튼 만들지 않고 바로 라운드 종료 처리
+        // (하단의 s4Next/s5Next 버튼이 다음 라운드로 안내)
+        state['round' + round + 'Step']++;
+        setTimeout(() => {
+          document.getElementById('s' + (round + 3) + 'Next').style.display = 'block';
+          showModal('🏆', `${round}라운드 승리!`, '훌륭한 변론이었어요!', '+15 보너스!');
+          state.score += 15; updateHUD();
+        }, 400);
+      } else {
+        // 중간 근거: 다음 근거로 가는 버튼 표시
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn btn-primary';
+        nextBtn.style.marginTop = '20px';
+        nextBtn.textContent = '▶ 다음 근거로';
+        nextBtn.onclick = () => {
+          state['round' + round + 'Step']++;
+          renderRoundPage(round);
+          window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+        area.appendChild(nextBtn);
+      }
+    }, 700);
+  } else {
+    el.classList.add('wrong');
+    state.score = Math.max(0, state.score - 10); updateHUD();
+    resetCombo();
+    setTimeout(() => el.classList.remove('wrong'), 600);
+  }
+}
+
+// Stage 6: 철학자 빈칸 채우기
+// 각 철학자별 정답: { phil0: ['느낌', '자유'], phil1: ['수단', '목적'], phil2: ['자기 자신', '자기'] }
+const PHIL_ANSWERS = {
+  0: ['느낌', '자유'],     // 벤담: 감시받고 있다는 '느낌'만으로도 '자유'를 잃는다
+  1: ['수단', '목적'],     // 칸트: 사람은 '수단'이 아니라 '목적'이다
+  2: ['자기 자신', '자기'], // 밀: '자기 자신'에 관한 일은 '자기'가 결정
+};
+// 진행 상태: 각 철학자마다 현재 채울 빈칸 인덱스
+const philProgress = { 0: 0, 1: 0, 2: 0 };
+const philDone = { 0: false, 1: false, 2: false };
+
+function pickPhilWord(el) {
+  if (el.classList.contains('used')) return;
+  const philIdx = el.dataset.phil;
+  const word = el.dataset.key;
+  if (philDone[philIdx]) return;
+
+  const answers = PHIL_ANSWERS[philIdx];
+  const expected = answers[philProgress[philIdx]];
+
+  if (word === expected) {
+    // 정답 — 빈칸에 채우기
+    el.classList.add('used');
+    const blankId = philProgress[philIdx] === 0 ? `blank-${philIdx}` : `blank-${philIdx}b`;
+    const blank = document.getElementById(blankId);
+    if (blank) {
+      blank.textContent = word;
+      blank.classList.add('filled-correct');
+    }
+    philProgress[philIdx]++;
+
+    const rect = el.getBoundingClientRect();
+    addScore(20, rect.left + 50, rect.top + 30);
+
+    // 두 빈칸 다 채웠는지?
+    if (philProgress[philIdx] >= 2) {
+      philDone[philIdx] = true;
+      state.philOpen++;
+      document.getElementById('s6Prog').textContent = `🧩 완성: ${state.philOpen} / 3`;
+      const result = document.getElementById(`result-${philIdx}`);
+      if (result) {
+        result.classList.add('success');
+        result.innerHTML = '✅ 완벽! 철학자의 생각을 이해했어요!';
+      }
+      // 다른 보기 비활성화
+      document.querySelectorAll(`.quiz-opt[data-phil="${philIdx}"]:not(.used)`).forEach(o => {
+        o.style.pointerEvents = 'none';
+        o.style.opacity = '0.4';
+      });
+
+      if (state.philOpen >= 3) {
+        setTimeout(() => showModal('🤔', '철학자 마스터!', '3명의 지혜를 모두 들었어요!', '+25 보너스!'), 400);
+        state.score += 25; updateHUD();
+        document.getElementById('s6Next').style.display = 'block';
+      }
+    }
+  } else {
+    // 오답
+    el.classList.add('wrong-flash');
+    state.score = Math.max(0, state.score - 5);
+    updateHUD();
+    resetCombo();
+    setTimeout(() => el.classList.remove('wrong-flash'), 600);
+  }
+}
+
+// Stage 7: 작문 — 키워드 체크 + 다중 문항 점수
+function checkWrite(inputId, countId, mustWordsId) {
+  const text = document.getElementById(inputId).value;
+  const len = text.length;
+  let hits = 0;
+  let totalWords = 0;
+
+  if (mustWordsId) {
+    const chips = document.querySelectorAll(`#${mustWordsId} .word-chip`);
+    totalWords = chips.length;
+    chips.forEach(chip => {
+      const w = chip.dataset.word;
+      if (text.includes(w)) {
+        if (!chip.classList.contains('hit')) {
+          chip.classList.add('hit');
+        }
+        hits++;
+      } else {
+        chip.classList.remove('hit');
+      }
+    });
+  }
+
+  const countEl = document.getElementById(countId);
+  if (countEl) {
+    countEl.textContent = `${len}자 · ${hits}/${totalWords} 단어`;
+  }
+}
+
+function submitWrite() {
+  // 1. 판결문 주장
+  const claim = document.getElementById('writeClaim').value.trim();
+  const ground = document.getElementById('writeGround').value.trim();
+
+  // 2. 짧은 글짓기 3개
+  const easy = document.getElementById('writeEasy').value.trim();
+  const medium = document.getElementById('writeMedium').value.trim();
+  const hard = document.getElementById('writeHard').value.trim();
+
+  state.written = { claim, ground, easy, medium, hard };
+
+  let totalBonus = 0;
+  let breakdown = [];
+
+  // 판결문 주장: 15자 이상 +20, 키워드 +5씩
+  if (claim.length >= 15) {
+    totalBonus += 20;
+    breakdown.push('주장 작성 +20');
+    let claimKW = countKeywords(claim, ['허락', '사생활', '동의']);
+    if (claimKW > 0) {
+      totalBonus += claimKW * 5;
+      breakdown.push(`주장 키워드 ${claimKW}개 +${claimKW * 5}`);
+    }
+  }
+
+  // 판결문 근거: 15자 이상 +20, 키워드 +5씩
+  if (ground.length >= 15) {
+    totalBonus += 20;
+    breakdown.push('근거 작성 +20');
+    let groundKW = countKeywords(ground, ['헌법', '신뢰', '권리']);
+    if (groundKW > 0) {
+      totalBonus += groundKW * 5;
+      breakdown.push(`근거 키워드 ${groundKW}개 +${groundKW * 5}`);
+    }
+  }
+
+  // 짧은 글짓기
+  let writtenCount = 0;
+  if (easy.length >= 15) {
+    totalBonus += 15;
+    writtenCount++;
+    breakdown.push('쉬움 챌린지 +15');
+    let kw = countKeywords(easy, ['약속', '대화']);
+    if (kw > 0) { totalBonus += kw * 5; breakdown.push(`쉬움 키워드 +${kw * 5}`); }
+  }
+  if (medium.length >= 20) {
+    totalBonus += 25;
+    writtenCount++;
+    breakdown.push('중간 챌린지 +25');
+    let kw = countKeywords(medium, ['속상', '신뢰', '이해']);
+    if (kw > 0) { totalBonus += kw * 5; breakdown.push(`중간 키워드 +${kw * 5}`); }
+  }
+  if (hard.length >= 25) {
+    totalBonus += 40;
+    writtenCount++;
+    breakdown.push('어려움 챌린지 +40');
+    let kw = countKeywords(hard, ['헌법', '인권', '사생활', '존중']);
+    if (kw > 0) { totalBonus += kw * 5; breakdown.push(`어려움 키워드 +${kw * 5}`); }
+  }
+
+  // 3개 다 쓰면 추가 보너스
+  if (writtenCount === 3) {
+    totalBonus += 30;
+    breakdown.push('🏆 3개 모두 완성 +30');
+  }
+
+  state.score += totalBonus;
+  updateHUD();
+
+  if (totalBonus > 0) {
+    const msg = breakdown.slice(0, 3).join('<br>') + (breakdown.length > 3 ? '<br>...' : '');
+    showModal('✍️', '작문 제출 완료!',
+      `총 ${totalBonus}점 획득!<br><span style="font-size:14px;color:var(--ink-soft);">${msg}</span>`,
+      '+' + totalBonus + ' 보너스!');
+    setTimeout(() => { closeModal(); goStage(8); }, 2500);
+  } else {
+    goStage(8);
+  }
+}
+
+function countKeywords(text, keywords) {
+  let count = 0;
+  for (const kw of keywords) {
+    if (text.includes(kw)) count++;
+  }
+  return count;
+}
+
+// Stage 8: 결과
+function showResult() {
+  document.getElementById('finalScore').textContent = state.score;
+  let rank = RANKS[0];
+  for (let r of RANKS) if (state.score >= r.min) rank = r;
+  document.getElementById('rankTitle').textContent = rank.name;
+  document.getElementById('trophyIcon').textContent =
+    state.score >= 700 ? '👑' :
+    state.score >= 500 ? '🏆' :
+    state.score >= 300 ? '🥈' :
+    state.score >= 150 ? '🥉' : '📜';
+
+  // 작성한 글들 표시
+  const w = state.written || {};
+  document.getElementById('showClaim').textContent = w.claim || '(작성 안 함)';
+  document.getElementById('showGround').textContent = w.ground || '(작성 안 함)';
+  document.getElementById('showEasy').textContent = w.easy || '(작성 안 함)';
+  document.getElementById('showMedium').textContent = w.medium || '(작성 안 함)';
+  document.getElementById('showHard').textContent = w.hard || '(작성 안 함)';
+}
+
+function showModal(icon, title, msg, scoreText) {
+  document.getElementById('clearIcon').textContent = icon;
+  document.getElementById('clearTitle').textContent = title;
+  document.getElementById('clearMsg').textContent = msg;
+  document.getElementById('clearScore').textContent = scoreText || '';
+  document.getElementById('clearModal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('clearModal').classList.remove('show');
+}
+
+function restartGame() {
+  if (!confirm('처음부터 다시 시작할까요?')) return;
+  state = {
+    score: 0, stage: 0, combo: 0,
+    s1Found: 0, s3Picked: 0,
+    matched: 0, matchSel: { term: null, def: null },
+    round1Step: 0, round2Step: 0,
+    philOpen: 0,
+    written: {}
+  };
+  // 철학자 진행 초기화
+  philProgress[0] = 0; philProgress[1] = 0; philProgress[2] = 0;
+  philDone[0] = false; philDone[1] = false; philDone[2] = false;
+
+  document.querySelectorAll('.word-bubble').forEach(w => w.classList.remove('correct', 'wrong'));
+  document.getElementById('s1Prog').textContent = '🎯 발견: 0 / 3';
+  document.getElementById('s1Next').style.display = 'none';
+
+  document.querySelectorAll('.match-card').forEach(m => m.classList.remove('matched', 'selected', 'wrong-flash'));
+  document.getElementById('s2Prog').textContent = '🔗 짝: 0 / 4';
+  document.getElementById('s2Next').style.display = 'none';
+
+  document.querySelectorAll('#s3Choices .choice').forEach(c => c.classList.remove('correct', 'wrong'));
+  document.getElementById('s3Prog').textContent = '⚡ 선택: 0 / 2';
+  document.getElementById('s3Next').style.display = 'none';
+
+  document.getElementById('round1-area').innerHTML = '';
+  document.getElementById('round2-area').innerHTML = '';
+  document.getElementById('s4Next').style.display = 'none';
+  document.getElementById('s5Next').style.display = 'none';
+
+  // 철학자 빈칸 리셋
+  document.querySelectorAll('.quiz-blank').forEach(b => {
+    b.textContent = '?';
+    b.classList.remove('filled-correct');
+  });
+  document.querySelectorAll('.quiz-opt').forEach(o => {
+    o.classList.remove('used', 'wrong-flash');
+    o.style.pointerEvents = '';
+    o.style.opacity = '';
+  });
+  document.querySelectorAll('.quiz-result').forEach(r => {
+    r.innerHTML = '';
+    r.classList.remove('success', 'fail');
+  });
+  document.getElementById('s6Prog').textContent = '🧩 완성: 0 / 3';
+  document.getElementById('s6Next').style.display = 'none';
+
+  // 작문 리셋
+  ['writeClaim','writeGround','writeEasy','writeMedium','writeHard'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['ccClaim','ccGround','ccEasy','ccMedium','ccHard'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const parts = el.textContent.match(/(\d+)\/(\d+)/);
+      const total = parts ? parts[2] : '?';
+      el.textContent = `0자 · 0/${total} 단어`;
+    }
+  });
+  document.querySelectorAll('.word-chip').forEach(c => c.classList.remove('hit'));
+
+  document.getElementById('hud').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s0').classList.add('active');
+  updateHUD();
+  window.scrollTo(0, 0);
+}
+
+updateHUD();
+renderBoards();
+</script>
+
+</body>
+</html>
